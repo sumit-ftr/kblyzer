@@ -1,8 +1,11 @@
+pub mod ui;
+pub mod update;
 use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Mapping {
     mapping: HashMap<u8, u8>,
+    quit: bool,
 }
 
 impl std::ops::Deref for Mapping {
@@ -46,6 +49,17 @@ impl Mapping {
             }
         }
 
-        Ok(Mapping { mapping: hmap })
+        Ok(Mapping {
+            mapping: hmap,
+            quit: false,
+        })
+    }
+
+    pub fn quit(&mut self) {
+        self.quit = true;
+    }
+
+    pub fn should_quit(&self) -> bool {
+        self.quit
     }
 }

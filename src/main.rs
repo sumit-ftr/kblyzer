@@ -1,13 +1,7 @@
-use ratatui::{
-    prelude::{CrosstermBackend, Terminal},
-    style::Stylize,
-    widgets::Paragraph,
-};
-
 use ltest::Mapping;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mapping = Mapping::new(std::env::args()).unwrap_or_else(|err| {
+    let mut mapping = Mapping::new(std::env::args()).unwrap_or_else(|err| {
         eprintln!("Error: {err}");
         std::process::exit(1);
     });
@@ -17,31 +11,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     crossterm::execute!(std::io::stderr(), crossterm::terminal::EnterAlternateScreen)?;
 
     // Initialize the terminal backend using crossterm
-    let mut terminal = Terminal::new(CrosstermBackend::new(std::io::stderr()))?;
+    let mut terminal =
+        ratatui::Terminal::new(ratatui::prelude::CrosstermBackend::new(std::io::stderr()))?;
 
-    loop {
-        terminal.draw(|f| {
-            f.render_widget(
-                Paragraph::new(format!("{mapping:?}")).yellow().on_black(),
-                f.size(),
-            );
-        })?;
-
-        if crossterm::event::poll(std::time::Duration::from_millis(250))? {
-            if let crossterm::event::Event::Key(key) = crossterm::event::read()? {
-                if key.kind == crossterm::event::KeyEventKind::Press {
-                    match key.code {
-                        crossterm::event::KeyCode::Char('q') => break,
-                        _ => {}
-                    }
-                }
-            }
-        }
+    while !mapping.should_quit() {
+        ltest::update::update(&mut mapping)?;
+        terminal.draw(|f| ltest::ui::render(&mapping, f))?;
     }
 
     // shutdown down: reset terminal back to original state
     crossterm::execute!(std::io::stderr(), crossterm::terminal::LeaveAlternateScreen)?;
     crossterm::terminal::disable_raw_mode()?;
-
     Ok(())
 }
