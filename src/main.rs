@@ -1,7 +1,7 @@
-use ltest::Mapping;
+use ltest::App;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut mapping = Mapping::new(std::env::args()).unwrap_or_else(|err| {
+    let mut app = App::new(std::env::args()).unwrap_or_else(|err| {
         eprintln!("Error: {err}");
         std::process::exit(1);
     });
@@ -14,9 +14,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut terminal =
         ratatui::Terminal::new(ratatui::prelude::CrosstermBackend::new(std::io::stderr()))?;
 
-    while !mapping.should_quit() {
-        ltest::update::update(&mut mapping)?;
-        terminal.draw(|f| ltest::ui::render(&mapping, f))?;
+    while !app.should_quit() {
+        ltest::update::update(&mut app)?;
+        terminal.draw(|f| ltest::ui::render(&app, f))?;
     }
 
     // shutdown down: reset terminal back to original state

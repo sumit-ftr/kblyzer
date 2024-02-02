@@ -1,9 +1,9 @@
-use crate::Mapping;
+use crate::App;
 use ratatui::{style::Stylize, widgets::Paragraph, Frame};
 
-pub fn render(mapping: &Mapping, f: &mut Frame) {
+pub fn render(app: &App, f: &mut Frame) {
     f.render_widget(
-        Paragraph::new(format!("{mapping:?}")).yellow().on_black(),
+        Paragraph::new(format!("{app:?}")).yellow().on_black(),
         f.size(),
     );
 }
