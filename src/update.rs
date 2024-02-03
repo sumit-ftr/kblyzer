@@ -1,15 +1,16 @@
+use crate::que::Que;
 use crate::App;
 use crossterm::event;
 use crossterm::event::{Event, KeyCode, KeyEventKind};
 use std::error::Error;
 
-pub fn update(app: &mut App) -> Result<(), Box<dyn Error>> {
+pub fn update(app: &App, q: &mut Que) -> Result<(), Box<dyn Error>> {
     if event::poll(std::time::Duration::from_millis(250))? {
         if let Event::Key(key) = event::read()? {
             if key.kind == KeyEventKind::Press {
                 match key.code {
                     KeyCode::Char('Q') => {
-                        app.quit();
+                        q.quit();
                         return Ok(());
                     }
                     _ => {}

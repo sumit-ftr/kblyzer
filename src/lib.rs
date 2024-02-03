@@ -1,3 +1,4 @@
+pub mod que;
 pub mod ui;
 pub mod update;
 use rand::Rng;
@@ -7,7 +8,6 @@ use std::collections::HashMap;
 pub struct App {
     mapping: HashMap<u8, u8>,
     words: HashMap<u16, (String, String)>,
-    quit: bool,
 }
 
 impl App {
@@ -31,6 +31,8 @@ impl App {
 
         for (dl, tl) in std::iter::zip(default_layout.lines(), target_layout.lines()) {
             for (ds, ts) in std::iter::zip(dl.split_whitespace(), tl.split_whitespace()) {
+                let ds = ds.to_lowercase();
+                let ts = ts.to_lowercase();
                 hmap.insert(
                     ds.parse::<char>().unwrap() as u8,
                     ts.parse::<char>().unwrap() as u8,
@@ -41,28 +43,28 @@ impl App {
         let mut app = App {
             mapping: hmap,
             words: HashMap::with_capacity(1000),
-            quit: false,
         };
-        app.shuffle();
+        app.generate()?;
         Ok(app)
     }
 
-    fn shuffle(&mut self) {
-        let wordlist = std::fs::read_to_string("wordlist.txt").unwrap_or_else(|_| {
-            self.quit();
-            "".to_string()
-        });
-
-        let mut s = wordlist.lines();
-        for i in 0..999 {
-            let s1 = s.next().unwrap();
-            // removing the new line character
-            let s1 = s1[..s1.len() - 1].to_owned();
-            let s2 = self.map_to_target(&s1);
-            self.words.insert(i, (s1, s2));
+    fn generate(&mut self) -> Result<(), &'static str> {
+        let wordlist = std::fs::read_to_string("wordlist.txt");
+        if let Err(_) = wordlist {
+            return Err("Wordlist Not Found");
+        } else {
+            let wordlist = wordlist.unwrap();
+            let mut s = wordlist.lines();
+            for i in 0..999 {
+                let s1 = s.next().unwrap().to_owned();
+                let s2 = self.map_to_target(&s1);
+                self.words.insert(i, (s1, s2));
+            }
+            Ok(())
         }
     }
 
+    #[inline]
     fn map_to_target(&self, s: &str) -> String {
         let mut new_s = String::with_capacity(s.len());
         for c in s.chars() {
@@ -72,15 +74,7 @@ impl App {
         new_s
     }
 
-    pub fn quit(&mut self) {
-        self.quit = true;
-    }
-
-    pub fn should_quit(&self) -> bool {
-        self.quit
-    }
-
-    pub fn get_word(&self) -> &(String, String) {
+    pub fn get_pair(&self) -> &(String, String) {
         let mut rng = rand::thread_rng();
         let res = self.words.get(&(rng.gen::<u16>() % 1000)).unwrap();
         res
