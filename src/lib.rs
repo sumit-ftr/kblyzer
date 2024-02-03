@@ -1,13 +1,16 @@
 pub mod que;
 pub mod ui;
 pub mod update;
+
 use rand::Rng;
 use std::collections::HashMap;
+use std::iter::zip;
 
-#[derive(Debug)]
 pub struct App {
     mapping: HashMap<u8, u8>,
     words: HashMap<u16, (String, String)>,
+    layout_left: [[u8; 5]; 3],
+    layout_right: [[u8; 5]; 3],
 }
 
 impl App {
@@ -22,17 +25,25 @@ impl App {
                 Ok(layout) => layout,
                 Err(_) => return Err("Layout Not Found"),
             };
-        let default_layout: String = match std::fs::read_to_string(format!("layouts/.default")) {
+        let default_layout: String = match std::fs::read_to_string(format!("layouts/default.conf"))
+        {
             Ok(layout) => layout,
             Err(_) => return Err("Default Layout Not Set"),
         };
 
         let mut hmap: HashMap<u8, u8> = HashMap::with_capacity(30);
+        let mut layout_left: [[u8; 5]; 3] = [[32; 5]; 3];
+        let mut layout_right: [[u8; 5]; 3] = [[32; 5]; 3];
 
-        for (dl, tl) in std::iter::zip(default_layout.lines(), target_layout.lines()) {
-            for (ds, ts) in std::iter::zip(dl.split_whitespace(), tl.split_whitespace()) {
+        for (i, (dl, tl)) in zip(default_layout.lines(), target_layout.lines()).enumerate() {
+            for (j, (ds, ts)) in zip(dl.split_whitespace(), tl.split_whitespace()).enumerate() {
                 let ds = ds.to_lowercase();
                 let ts = ts.to_lowercase();
+                if j <= 4 {
+                    layout_left[i][j] = ts.parse::<char>().unwrap() as u8;
+                } else {
+                    layout_right[i][j - 5] = ts.parse::<char>().unwrap() as u8;
+                }
                 hmap.insert(
                     ds.parse::<char>().unwrap() as u8,
                     ts.parse::<char>().unwrap() as u8,
@@ -40,9 +51,15 @@ impl App {
             }
         }
 
+        if hmap.len() != 30 {
+            return Err("Layout Not Set Properly");
+        }
+
         let mut app = App {
             mapping: hmap,
             words: HashMap::with_capacity(1000),
+            layout_left,
+            layout_right,
         };
         app.generate()?;
         Ok(app)
@@ -74,6 +91,7 @@ impl App {
         new_s
     }
 
+    #[inline]
     pub fn get_pair(&self) -> &(String, String) {
         let mut rng = rand::thread_rng();
         let res = self.words.get(&(rng.gen::<u16>() % 1000)).unwrap();

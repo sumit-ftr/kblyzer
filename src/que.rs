@@ -29,6 +29,7 @@ impl<'a> Que<'a> {
         frame_size
     }
 
+    #[inline]
     fn set_line(&mut self) {
         let mut index = 0usize;
         for i in self.line.iter_mut() {
