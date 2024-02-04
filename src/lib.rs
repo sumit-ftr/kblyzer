@@ -92,9 +92,9 @@ impl App {
     }
 
     #[inline]
-    pub fn get_pair(&self) -> &(String, String) {
+    pub fn get_pair(&self) -> (&String, &String) {
         let mut rng = rand::thread_rng();
-        let res = self.words.get(&(rng.gen::<u16>() % 1000)).unwrap();
-        res
+        let res = self.words.get(&(rng.gen::<u16>() % 999)).unwrap();
+        (&res.0, &res.1)
     }
 }

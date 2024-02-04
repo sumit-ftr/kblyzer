@@ -9,7 +9,7 @@ pub fn update(app: &App, q: &mut Que) -> Result<(), Box<dyn Error>> {
         if let Event::Key(key) = event::read()? {
             if key.kind == KeyEventKind::Press {
                 match key.code {
-                    KeyCode::Char('Q') => {
+                    KeyCode::Esc => {
                         q.quit();
                         return Ok(());
                     }
