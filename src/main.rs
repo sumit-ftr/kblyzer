@@ -6,7 +6,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("Error: {err}");
         std::process::exit(1);
     });
-    let mut q = Que::new(&app, 32);
+    // this is taking up a bit of execution time (because it is getting reinitialized) but this is the only way I made this work
+    let mut q: Que = Default::default();
 
     // startup: Enable raw mode for the terminal, giving us fine control over user input
     crossterm::terminal::enable_raw_mode()?;
@@ -16,9 +17,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut terminal =
         ratatui::Terminal::new(ratatui::prelude::CrosstermBackend::new(std::io::stderr()))?;
 
+    terminal.draw(|f| {
+        q = Que::new(&app, f.size().width);
+        ltest::ui::render(&app, &q, f);
+    })?;
     while !q.should_quit() {
         ltest::update::update(&app, &mut q)?;
-        terminal.draw(|f| ltest::ui::render(&app, &q, f))?;
     }
 
     // shutdown down: reset terminal back to original state

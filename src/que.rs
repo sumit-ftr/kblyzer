@@ -1,7 +1,7 @@
 use crate::App;
 use std::collections::VecDeque;
 
-#[derive(Debug)]
+#[derive(Default)]
 pub struct Que<'a> {
     qd: VecDeque<&'a String>,
     qt: VecDeque<&'a String>,
@@ -40,7 +40,7 @@ impl<'a> Que<'a> {
 
     #[inline]
     fn set_line_len(frame_size: u16) -> u16 {
-        frame_size
+        (frame_size * 8) / 10
     }
 
     #[inline]
