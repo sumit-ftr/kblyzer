@@ -19,7 +19,7 @@ pub fn render(app: &App, q: &Que, frame: &mut Frame) {
         ])
         .split(frame.size());
 
-    let layout_t = Layout::default()
+    let wq_target_block = Layout::default()
         .direction(Direction::Horizontal)
         .constraints(vec![
             Constraint::Percentage(10),
@@ -28,27 +28,27 @@ pub fn render(app: &App, q: &Que, frame: &mut Frame) {
         ])
         .split(layout[0]);
 
-    let layout_t_inner = Layout::default()
+    let wq_target = Layout::default()
         .direction(Direction::Vertical)
         .constraints(vec![
-            Constraint::Length(3),
+            Constraint::Max(3),
+            Constraint::Length(1),
+            Constraint::Length(1),
+            Constraint::Length(1),
             Constraint::Min(1),
-            Constraint::Min(1),
-            Constraint::Min(1),
-            Constraint::Length(3),
         ])
-        .split(layout_t[1]);
+        .split(wq_target_block[1]);
 
     let layout_kb = Layout::default()
         .direction(Direction::Horizontal)
         .constraints(vec![
-            Constraint::Percentage(35),
             Constraint::Percentage(30),
-            Constraint::Percentage(35),
+            Constraint::Percentage(40),
+            Constraint::Percentage(30),
         ])
         .split(layout[1]);
 
-    let layout_d = Layout::default()
+    let wq_default_block = Layout::default()
         .direction(Direction::Horizontal)
         .constraints(vec![
             Constraint::Percentage(10),
@@ -57,16 +57,16 @@ pub fn render(app: &App, q: &Que, frame: &mut Frame) {
         ])
         .split(layout[2]);
 
-    let layout_d_inner = Layout::default()
+    let wq_default = Layout::default()
         .direction(Direction::Vertical)
         .constraints(vec![
-            Constraint::Length(3),
+            Constraint::Max(3),
+            Constraint::Length(1),
+            Constraint::Length(1),
+            Constraint::Length(1),
             Constraint::Min(1),
-            Constraint::Min(1),
-            Constraint::Min(1),
-            Constraint::Length(3),
         ])
-        .split(layout_d[1]);
+        .split(wq_default_block[1]);
 
     frame.render_widget(
         Paragraph::new("")
@@ -86,9 +86,9 @@ pub fn render(app: &App, q: &Que, frame: &mut Frame) {
     render_layout(frame, layout_kb[0], &app.layout_left);
     render_layout(frame, layout_kb[2], &app.layout_right);
     render_word_pair(frame, layout_kb[1], &app);
-    render_lines(frame, &layout_t_inner, &layout_d_inner, &q, 0);
-    render_lines(frame, &layout_t_inner, &layout_d_inner, &q, 1);
-    render_lines(frame, &layout_t_inner, &layout_d_inner, &q, 2);
+    render_lines(frame, &wq_target, &wq_default, &q, 0);
+    render_lines(frame, &wq_target, &wq_default, &q, 1);
+    render_lines(frame, &wq_target, &wq_default, &q, 2);
 }
 
 fn render_layout(frame: &mut Frame, r: Rect, a: &[[u8; 5]; 3]) {
@@ -103,7 +103,7 @@ fn render_layout(frame: &mut Frame, r: Rect, a: &[[u8; 5]; 3]) {
     let row = Layout::default()
         .direction(Direction::Vertical)
         .constraints(vec![
-            Constraint::Min(4),
+            Constraint::Max(4),
             Constraint::Length(3),
             Constraint::Length(3),
             Constraint::Length(3),
@@ -114,39 +114,39 @@ fn render_layout(frame: &mut Frame, r: Rect, a: &[[u8; 5]; 3]) {
     let row0 = Layout::default()
         .direction(Direction::Horizontal)
         .constraints(vec![
-            Constraint::Min(12),
+            Constraint::Max(8),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
-            Constraint::Min(12),
+            Constraint::Min(1),
         ])
         .split(row[1]);
 
     let row1 = Layout::default()
         .direction(Direction::Horizontal)
         .constraints(vec![
-            Constraint::Min(12),
+            Constraint::Max(8),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
-            Constraint::Min(12),
+            Constraint::Min(1),
         ])
         .split(row[2]);
 
     let row2 = Layout::default()
         .direction(Direction::Horizontal)
         .constraints(vec![
-            Constraint::Min(12),
+            Constraint::Max(8),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
-            Constraint::Min(12),
+            Constraint::Min(1),
         ])
         .split(row[3]);
 

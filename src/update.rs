@@ -2,21 +2,26 @@ use crate::que::Que;
 use crate::App;
 use crossterm::event;
 use crossterm::event::{Event, KeyCode, KeyEventKind};
-use std::error::Error;
+use ratatui::prelude::Rect;
+use std::{collections::HashMap, error::Error};
 
 pub fn update(app: &App, q: &mut Que) -> Result<(), Box<dyn Error>> {
     if event::poll(std::time::Duration::from_millis(250))? {
         if let Event::Key(key) = event::read()? {
             if key.kind == KeyEventKind::Press {
-                match key.code {
-                    KeyCode::Esc => {
-                        q.quit();
-                        return Ok(());
-                    }
-                    _ => {}
+                if let KeyCode::Esc = key.code {
+                    q.quit();
+                    return Ok(());
+                } else if let KeyCode::Char(ch) = key.code {
                 }
             }
         }
     }
     Ok(())
+}
+
+struct State {
+    r: HashMap<char, Rect>,
+    pre_ch: char,
+    cur_ch: char,
 }

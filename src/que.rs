@@ -5,9 +5,9 @@ use std::collections::VecDeque;
 pub struct Que<'a> {
     qd: VecDeque<&'a String>,
     qt: VecDeque<&'a String>,
-    line: [u16; 3],
     pub dline: [String; 3],
     pub tline: [String; 3],
+    line: [u16; 3],
     line_len: u16,
     quit: bool,
 }

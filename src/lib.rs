@@ -45,8 +45,8 @@ impl App {
                     layout_right[i][j - 5] = ts.parse::<char>().unwrap() as u8;
                 }
                 hmap.insert(
-                    ds.parse::<char>().unwrap() as u8,
                     ts.parse::<char>().unwrap() as u8,
+                    ds.parse::<char>().unwrap() as u8,
                 );
             }
         }
