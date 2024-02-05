@@ -4,15 +4,43 @@ use ratatui::{
     layout::{Constraint, Layout, Rect},
     prelude::Direction,
     style::{Color, Stylize},
-    widgets::{Block, Borders, Paragraph, Wrap},
+    widgets::{Block, Borders, Paragraph},
     Frame,
 };
 use std::rc::Rc;
 
+trait RenderCustomBlocks {
+    fn smaller_rect(&self) -> Self;
+    fn render_better_border(&self, frame: &mut Frame, cfg: &Color, cbg: &Color);
+    fn render_normal_border(&self, frame: &mut Frame, cfg: &Color, cbg: &Color);
+}
+
+impl RenderCustomBlocks for Rect {
+    #[inline]
+    fn smaller_rect(&self) -> Self {
+        Rect {
+            x: self.x + 1,
+            y: self.y,
+            width: self.width - 2,
+            height: self.height,
+        }
+    }
+    fn render_better_border(&self, frame: &mut Frame, cfg: &Color, cbg: &Color) {
+        frame.render_widget(Block::new().bg(*cbg), *self);
+        frame.render_widget(
+            Block::new().fg(*cfg).borders(Borders::ALL),
+            self.smaller_rect(),
+        );
+    }
+    fn render_normal_border(&self, frame: &mut Frame, cfg: &Color, cbg: &Color) {
+        frame.render_widget(Block::new().fg(*cfg).bg(*cbg).borders(Borders::ALL), *self);
+    }
+}
+
 pub fn render(app: &App, q: &Que, frame: &mut Frame) {
     let layout = Layout::default()
         .direction(Direction::Vertical)
-        .constraints(vec![
+        .constraints([
             Constraint::Percentage(25),
             Constraint::Percentage(50),
             Constraint::Percentage(25),
@@ -21,7 +49,7 @@ pub fn render(app: &App, q: &Que, frame: &mut Frame) {
 
     let wq_target_block = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints(vec![
+        .constraints([
             Constraint::Percentage(10),
             Constraint::Percentage(80),
             Constraint::Percentage(10),
@@ -30,7 +58,7 @@ pub fn render(app: &App, q: &Que, frame: &mut Frame) {
 
     let wq_target = Layout::default()
         .direction(Direction::Vertical)
-        .constraints(vec![
+        .constraints([
             Constraint::Max(3),
             Constraint::Length(1),
             Constraint::Length(1),
@@ -41,7 +69,7 @@ pub fn render(app: &App, q: &Que, frame: &mut Frame) {
 
     let layout_kb = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints(vec![
+        .constraints([
             Constraint::Percentage(30),
             Constraint::Percentage(40),
             Constraint::Percentage(30),
@@ -50,7 +78,7 @@ pub fn render(app: &App, q: &Que, frame: &mut Frame) {
 
     let wq_default_block = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints(vec![
+        .constraints([
             Constraint::Percentage(10),
             Constraint::Percentage(80),
             Constraint::Percentage(10),
@@ -59,7 +87,7 @@ pub fn render(app: &App, q: &Que, frame: &mut Frame) {
 
     let wq_default = Layout::default()
         .direction(Direction::Vertical)
-        .constraints(vec![
+        .constraints([
             Constraint::Max(3),
             Constraint::Length(1),
             Constraint::Length(1),
@@ -68,41 +96,26 @@ pub fn render(app: &App, q: &Que, frame: &mut Frame) {
         ])
         .split(wq_default_block[1]);
 
-    frame.render_widget(
-        Paragraph::new("")
-            .fg(Color::Rgb(255, 211, 0))
-            .bg(Color::Rgb(24, 24, 24))
-            .block(Block::new().borders(Borders::ALL)),
-        layout[0],
-    );
-    frame.render_widget(
-        Paragraph::new("")
-            .fg(Color::Rgb(255, 211, 0))
-            .bg(Color::Rgb(24, 24, 24))
-            .block(Block::new().borders(Borders::ALL)),
-        layout[2],
-    );
+    let col1 = Color::Rgb(255, 211, 0);
+    let col2 = Color::Rgb(24, 24, 24);
+    layout[0].render_better_border(frame, &col1, &col2);
+    layout[2].render_better_border(frame, &col1, &col2);
 
-    render_layout(frame, layout_kb[0], &app.layout_left);
-    render_layout(frame, layout_kb[2], &app.layout_right);
-    render_word_pair(frame, layout_kb[1], &app);
+    render_half_layout(frame, layout_kb[0], &app.layout_left);
+    render_half_layout(frame, layout_kb[2], &app.layout_right);
+    render_word_pair(frame, layout_kb[1]);
+
     render_lines(frame, &wq_target, &wq_default, &q, 0);
     render_lines(frame, &wq_target, &wq_default, &q, 1);
     render_lines(frame, &wq_target, &wq_default, &q, 2);
 }
 
-fn render_layout(frame: &mut Frame, r: Rect, a: &[[u8; 5]; 3]) {
-    frame.render_widget(
-        Paragraph::new("")
-            .black()
-            .on_blue()
-            .block(Block::new().borders(Borders::ALL)),
-        r,
-    );
+fn render_half_layout(frame: &mut Frame, r: Rect, a: &[[u8; 5]; 3]) {
+    r.render_better_border(frame, &Color::Rgb(196, 196, 196), &Color::Rgb(64, 64, 64));
 
     let row = Layout::default()
         .direction(Direction::Vertical)
-        .constraints(vec![
+        .constraints([
             Constraint::Max(4),
             Constraint::Length(3),
             Constraint::Length(3),
@@ -113,73 +126,84 @@ fn render_layout(frame: &mut Frame, r: Rect, a: &[[u8; 5]; 3]) {
 
     let row0 = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints(vec![
+        .constraints([
             Constraint::Max(8),
+            Constraint::Length(1),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
+            Constraint::Length(1),
             Constraint::Min(1),
         ])
         .split(row[1]);
 
     let row1 = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints(vec![
+        .constraints([
             Constraint::Max(8),
+            Constraint::Length(1),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
+            Constraint::Length(1),
             Constraint::Min(1),
         ])
         .split(row[2]);
 
     let row2 = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints(vec![
+        .constraints([
             Constraint::Max(8),
+            Constraint::Length(1),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
             Constraint::Length(5),
+            Constraint::Length(1),
             Constraint::Min(1),
         ])
         .split(row[3]);
 
+    let cfg = Color::Rgb(64, 64, 64);
+    let cbg = Color::Rgb(196, 196, 196);
+    render_weird(row0[1], frame, &cfg, &cbg);
+    render_weird(row0[7], frame, &cfg, &cbg);
+    render_weird(row1[1], frame, &cfg, &cbg);
+    render_weird(row1[7], frame, &cfg, &cbg);
+    render_weird(row2[1], frame, &cfg, &cbg);
+    render_weird(row2[7], frame, &cfg, &cbg);
     for i in 0..5 {
-        render_char(frame, row0[i + 1], a[0][i]);
+        render_char(row0[i + 2], frame, &cfg, &cbg, a[0][i]);
     }
     for i in 0..5 {
-        render_char(frame, row1[i + 1], a[1][i]);
+        render_char(row1[i + 2], frame, &cfg, &cbg, a[1][i]);
     }
     for i in 0..5 {
-        render_char(frame, row2[i + 1], a[2][i]);
+        render_char(row2[i + 2], frame, &cfg, &cbg, a[2][i]);
     }
 }
 
-fn render_char(frame: &mut Frame, r: Rect, ch: u8) {
+fn render_char(r: Rect, frame: &mut Frame, cfg: &Color, cbg: &Color, ch: u8) {
     frame.render_widget(
         Paragraph::new(format!(" {}", ch as char))
-            .fg(Color::Rgb(64, 64, 64))
-            .bg(Color::Rgb(196, 196, 196))
-            // .wrap(Wrap { trim: true })
+            .fg(*cfg)
+            .bg(*cbg)
             .block(Block::new().borders(Borders::ALL)),
         r,
     );
 }
 
-fn render_word_pair(frame: &mut Frame, l: Rect, app: &App) {
-    frame.render_widget(
-        Paragraph::new(format!("word pair not implemented"))
-            .white()
-            .on_black()
-            .block(Block::new().borders(Borders::ALL)),
-        l,
-    );
+fn render_weird(r: Rect, frame: &mut Frame, cfg: &Color, cbg: &Color) {
+    frame.render_widget(Block::new().fg(*cfg).bg(*cbg), r);
+}
+
+fn render_word_pair(frame: &mut Frame, r: Rect) {
+    r.render_normal_border(frame, &Color::Rgb(196, 196, 196), &Color::Rgb(64, 64, 64));
 }
 
 fn render_lines(frame: &mut Frame, lt: &Rc<[Rect]>, ld: &Rc<[Rect]>, q: &Que, lno: usize) {

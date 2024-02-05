@@ -21,7 +21,7 @@ pub fn update(app: &App, q: &mut Que) -> Result<(), Box<dyn Error>> {
 }
 
 struct State {
-    r: HashMap<char, Rect>,
-    pre_ch: char,
-    cur_ch: char,
+    r: HashMap<u8, Rect>,
+    pre_ch: Option<u8>,
+    cur_ch: u8,
 }
