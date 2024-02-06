@@ -1,8 +1,8 @@
-use crate::App;
+use crate::data::Data;
 use std::collections::VecDeque;
 
 #[derive(Default)]
-pub struct Que<'a> {
+pub struct App<'a> {
     qd: VecDeque<&'a String>,
     qt: VecDeque<&'a String>,
     pub dline: [String; 3],
@@ -12,15 +12,15 @@ pub struct Que<'a> {
     quit: bool,
 }
 
-impl<'a> Que<'a> {
-    pub fn new(app: &'a App, frame_size: u16) -> Que<'a> {
-        let x = Que::set_line_len(frame_size) as usize;
+impl<'a> App<'a> {
+    pub fn new(data: &'a Data, frame_size: u16) -> App<'a> {
+        let x = App::set_line_len(frame_size) as usize;
         let y = [
             String::with_capacity(x + 1),
             String::with_capacity(x + 1),
             String::with_capacity(x + 1),
         ];
-        let mut nq = Que {
+        let mut nq = App {
             qd: VecDeque::with_capacity(128),
             qt: VecDeque::with_capacity(128),
             line: [0; 3],
@@ -30,7 +30,7 @@ impl<'a> Que<'a> {
             quit: false,
         };
         for _ in nq.qd.len()..nq.qd.capacity() {
-            let (a, b) = app.get_pair();
+            let (a, b) = data.get_pair();
             nq.qd.push_back(a);
             nq.qt.push_back(b);
         }
@@ -69,12 +69,12 @@ impl<'a> Que<'a> {
         }
     }
 
-    pub fn sync_on_nspace(&mut self, app: &'a App) {
+    pub fn sync_on_nspace(&mut self, data: &'a Data) {
         // syncing word queue(q) in Que
         for _ in 0..self.line[0] {
             self.qd.pop_front();
             self.qt.pop_front();
-            let (a, b) = app.get_pair();
+            let (a, b) = data.get_pair();
             self.qd.push_back(a);
             self.qt.push_back(b);
         }
@@ -103,7 +103,7 @@ impl<'a> Que<'a> {
     }
 
     pub fn sync_on_resize(&mut self, frame_size: u16) {
-        self.line_len = Que::set_line_len(frame_size);
+        self.line_len = App::set_line_len(frame_size);
         self.set_line();
     }
 

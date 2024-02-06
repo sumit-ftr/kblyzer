@@ -1,5 +1,5 @@
-use crate::que::Que;
-use crate::App;
+use crate::app::App;
+use crate::data::Data;
 use ratatui::{
     layout::{Constraint, Layout, Rect},
     prelude::Direction,
@@ -37,7 +37,7 @@ impl RenderCustomBlocks for Rect {
     }
 }
 
-pub fn render(app: &App, q: &Que, frame: &mut Frame) {
+pub fn render(data: &Data, app: &App, frame: &mut Frame) {
     let layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
@@ -101,13 +101,13 @@ pub fn render(app: &App, q: &Que, frame: &mut Frame) {
     layout[0].render_better_border(frame, &col1, &col2);
     layout[2].render_better_border(frame, &col1, &col2);
 
-    render_half_layout(frame, layout_kb[0], &app.layout_left);
-    render_half_layout(frame, layout_kb[2], &app.layout_right);
+    render_half_layout(frame, layout_kb[0], &data.layout_left);
+    render_half_layout(frame, layout_kb[2], &data.layout_right);
     render_word_pair(frame, layout_kb[1]);
 
-    render_lines(frame, &wq_target, &wq_default, &q, 0);
-    render_lines(frame, &wq_target, &wq_default, &q, 1);
-    render_lines(frame, &wq_target, &wq_default, &q, 2);
+    render_lines(frame, &wq_target, &wq_default, &app, 0);
+    render_lines(frame, &wq_target, &wq_default, &app, 1);
+    render_lines(frame, &wq_target, &wq_default, &app, 2);
 }
 
 fn render_half_layout(frame: &mut Frame, r: Rect, a: &[[u8; 5]; 3]) {
@@ -188,7 +188,7 @@ fn render_half_layout(frame: &mut Frame, r: Rect, a: &[[u8; 5]; 3]) {
     }
 }
 
-fn render_char(r: Rect, frame: &mut Frame, cfg: &Color, cbg: &Color, ch: u8) {
+pub fn render_char(r: Rect, frame: &mut Frame, cfg: &Color, cbg: &Color, ch: u8) {
     frame.render_widget(
         Paragraph::new(format!(" {}", ch as char))
             .fg(*cfg)
@@ -202,11 +202,11 @@ fn render_weird(r: Rect, frame: &mut Frame, cfg: &Color, cbg: &Color) {
     frame.render_widget(Block::new().fg(*cfg).bg(*cbg), r);
 }
 
-fn render_word_pair(frame: &mut Frame, r: Rect) {
+pub fn render_word_pair(frame: &mut Frame, r: Rect) {
     r.render_normal_border(frame, &Color::Rgb(196, 196, 196), &Color::Rgb(64, 64, 64));
 }
 
-fn render_lines(frame: &mut Frame, lt: &Rc<[Rect]>, ld: &Rc<[Rect]>, q: &Que, lno: usize) {
+pub fn render_lines(frame: &mut Frame, lt: &Rc<[Rect]>, ld: &Rc<[Rect]>, q: &App, lno: usize) {
     frame.render_widget(
         Paragraph::new(&q.tline[lno] as &str)
             .fg(Color::Rgb(255, 211, 0))
