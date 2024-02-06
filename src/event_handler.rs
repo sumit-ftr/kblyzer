@@ -1,14 +1,9 @@
 use crate::app::App;
 use crate::data::Data;
-use crate::ui::*;
-use crossterm::event;
-use crossterm::event::{Event, KeyCode, KeyEventKind};
-use ratatui::style::Color;
-use std::error::Error;
+use crate::AppResult;
+use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 
-pub fn update(data: &Data, app: &mut App) -> Result<(), Box<dyn Error>> {
-    let red = Color::Red;
-    let black = Color::Black;
+pub fn update(data: &Data, app: &mut App) -> AppResult<()> {
     if event::poll(std::time::Duration::from_millis(250))? {
         if let Event::Key(key) = event::read()? {
             if key.kind == KeyEventKind::Press {

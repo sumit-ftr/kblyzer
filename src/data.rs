@@ -26,7 +26,7 @@ impl Data {
             Err(_) => return Err("Default Layout Not Set"),
         };
 
-        // Note: This hashmap is never needed throughout the program so it is not included in app struct
+        // Note: This hashmap is never needed throughout the program so it is not included in data struct
         let mut hmap: HashMap<u8, u8> = HashMap::with_capacity(30);
         let mut layout_left: [[u8; 5]; 3] = [[32; 5]; 3];
         let mut layout_right: [[u8; 5]; 3] = [[32; 5]; 3];

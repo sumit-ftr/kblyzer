@@ -1,7 +1,8 @@
 use ltest::app::App;
 use ltest::data::Data;
+use ltest::AppResult;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> AppResult<()> {
     let data = Data::new(std::env::args()).unwrap_or_else(|err| {
         eprintln!("Error: {err}");
         std::process::exit(1);
@@ -22,7 +23,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ltest::ui::render(&data, &app, frame);
     })?;
     while !app.should_quit() {
-        ltest::update::update(&data, &mut app)?;
+        ltest::event_handler::update(&data, &mut app)?;
     }
 
     // shutdown down: reset terminal back to original state
