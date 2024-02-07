@@ -1,5 +1,7 @@
+use crate::AppResult;
 use rand::Rng;
 use std::collections::HashMap;
+use std::error::Error;
 use std::iter::zip;
 
 pub struct Data {
@@ -9,21 +11,21 @@ pub struct Data {
 }
 
 impl Data {
-    pub fn new(mut a: std::env::Args) -> Result<Data, &'static str> {
+    pub fn new(mut a: std::env::Args) -> AppResult<Data> {
         a.next();
         let target_layout: String = match a.next() {
             Some(layout_name) => layout_name,
-            None => return Err("Insufficient Arguments"),
+            None => return Err(Box::<dyn Error>::from("Insufficient Arguments")),
         };
         let target_layout: String =
             match std::fs::read_to_string(format!("layouts/{target_layout}")) {
                 Ok(layout) => layout,
-                Err(_) => return Err("Layout Not Found"),
+                Err(_) => return Err(Box::<dyn Error>::from("Layout Not Found")),
             };
         let default_layout: String = match std::fs::read_to_string(format!("layouts/default.conf"))
         {
             Ok(layout) => layout,
-            Err(_) => return Err("Default Layout Not Set"),
+            Err(_) => return Err(Box::<dyn Error>::from("Default Layout Not Set")),
         };
 
         // Note: This hashmap is never needed throughout the program so it is not included in data struct
@@ -48,7 +50,7 @@ impl Data {
         }
 
         if hmap.len() != 30 {
-            return Err("Layout Not Set Properly");
+            return Err(Box::<dyn Error>::from("Layout Not Set Properly"));
         }
 
         let mut app = Data {
@@ -60,10 +62,10 @@ impl Data {
         Ok(app)
     }
 
-    fn generate(&mut self, hmap: &HashMap<u8, u8>) -> Result<(), &'static str> {
+    fn generate(&mut self, hmap: &HashMap<u8, u8>) -> AppResult<()> {
         let wordlist = std::fs::read_to_string("wordlist.txt");
         if let Err(_) = wordlist {
-            return Err("Wordlist Not Found");
+            return Err(Box::<dyn Error>::from("Wordlist Not Found"));
         } else {
             let wordlist = wordlist.unwrap();
             let mut s = wordlist.lines();
