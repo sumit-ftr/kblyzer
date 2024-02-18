@@ -41,8 +41,8 @@ pub fn render(data: &Data, app: &App, frame: &mut Frame) {
     let layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Percentage(25),
             Constraint::Percentage(50),
+            Constraint::Percentage(25),
             Constraint::Percentage(25),
         ])
         .split(frame.size());
@@ -54,7 +54,7 @@ pub fn render(data: &Data, app: &App, frame: &mut Frame) {
             Constraint::Percentage(80),
             Constraint::Percentage(10),
         ])
-        .split(layout[0]);
+        .split(layout[1]);
 
     let wq_target = Layout::default()
         .direction(Direction::Vertical)
@@ -74,7 +74,7 @@ pub fn render(data: &Data, app: &App, frame: &mut Frame) {
             Constraint::Percentage(40),
             Constraint::Percentage(30),
         ])
-        .split(layout[1]);
+        .split(layout[0]);
 
     let wq_default_block = Layout::default()
         .direction(Direction::Horizontal)
@@ -98,7 +98,7 @@ pub fn render(data: &Data, app: &App, frame: &mut Frame) {
 
     let col1 = Color::Rgb(255, 211, 0);
     let col2 = Color::Rgb(24, 24, 24);
-    layout[0].render_better_border(frame, &col1, &col2);
+    layout[1].render_better_border(frame, &col1, &col2);
     layout[2].render_better_border(frame, &col1, &col2);
 
     render_half_layout(frame, layout_kb[0], &data.layout_left);

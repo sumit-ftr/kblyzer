@@ -72,7 +72,7 @@ impl<'a> App<'a> {
         self.max_line_len
     }
 
-    pub fn sync_on_char_press(&mut self) {
+    pub fn sync_on_ascii_press(&mut self) {
         self.line_ch_index += 1;
     }
 

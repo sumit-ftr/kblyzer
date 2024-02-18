@@ -63,7 +63,7 @@ impl Data {
     }
 
     fn generate(&mut self, hmap: &HashMap<u8, u8>) -> AppResult<()> {
-        let wordlist = std::fs::read_to_string("wordlist.txt");
+        let wordlist = std::fs::read_to_string("wordlists/1k.txt");
         if let Err(_) = wordlist {
             return Err(Box::<dyn Error>::from("Wordlist Not Found"));
         } else {

@@ -124,6 +124,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "kblyzer"
+version = "0.1.0"
+dependencies = [
+ "crossterm",
+ "rand",
+ "ratatui",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.153"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -152,15 +161,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "db2c024b41519440580066ba82aab04092b333e09066a5eb86c7c4890df31f22"
 dependencies = [
  "hashbrown",
-]
-
-[[package]]
-name = "ltest"
-version = "0.1.0"
-dependencies = [
- "crossterm",
- "rand",
- "ratatui",
 ]
 
 [[package]]

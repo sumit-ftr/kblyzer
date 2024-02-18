@@ -1,5 +1,5 @@
 [package]
-name = "ltest"
+name = "kblyzer"
 version = "0.1.0"
 edition = "2021"
 

@@ -1,6 +1,6 @@
-use ltest::app::App;
-use ltest::data::Data;
-use ltest::AppResult;
+use kblyzer::app::App;
+use kblyzer::data::Data;
+use kblyzer::AppResult;
 
 fn main() -> AppResult<()> {
     let data = Data::new(std::env::args()).unwrap_or_else(|err| {
@@ -20,10 +20,10 @@ fn main() -> AppResult<()> {
 
     terminal.draw(|frame| {
         app = App::new(&data, frame.size().width);
-        ltest::ui::render(&data, &app, frame);
+        kblyzer::ui::render(&data, &app, frame);
     })?;
     while !app.should_quit() {
-        ltest::event_handler::update(&data, &mut app)?;
+        kblyzer::event_handler::update(&data, &mut app)?;
     }
 
     // shutdown down: reset terminal back to original state
